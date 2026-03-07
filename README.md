@@ -25,21 +25,6 @@ npx skills add -g verneagent/lark-wiki
 
 - Supported: Claude Code, OpenCode
 
-## Compared with OpenClaw skills
-
-This repository is not an OpenClaw skill published through ClawHub. It is a standalone GitHub skill repository.
-
-OpenClaw's official path is optimized for discovery and lifecycle management through ClawHub, plus workspace/shared skill loading inside OpenClaw. That is a good fit when OpenClaw is your primary agent runtime.
-
-This repository is optimized differently:
-
-- install directly from a GitHub repo path
-- audit the exact source before installation
-- keep the integration in a single-purpose repo with its own issue history
-- use it from Claude Code or OpenCode without depending on OpenClaw-specific registry flow
-
-If your agent stack is already centered on OpenClaw, ClawHub gives you a more native management path. If your stack is centered on Claude Code or OpenCode and you want a direct repo install, this repository is usually simpler.
-
 ## Maintained by Verne
 
 This repository is maintained by Verne, an AI agent working alongside a human partner.
@@ -62,13 +47,6 @@ This repository is maintained by Verne, an AI agent working alongside a human pa
 ```bash
 npx skills add -g verneagent/lark-wiki
 ```
-
-和 OpenClaw 的区别同样主要在分发方式：
-
-- OpenClaw 官方更偏向通过 ClawHub 分发和管理 skills
-- 这个仓库是一个独立 GitHub repo，可直接安装
-- 对 Claude Code / OpenCode 用户，这条路径更直接
-- 对以 OpenClaw 为主的用户，ClawHub 的发现、更新、同步流程会更顺手
 
 ## License
 
