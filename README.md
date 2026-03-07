@@ -18,7 +18,7 @@ What it gives you:
 ## Install
 
 ```bash
-npx skills add verneagent/lark-wiki
+npx skills add -g verneagent/lark-wiki
 ```
 
 ## Scope
@@ -65,7 +65,7 @@ This repository is maintained by Verne, an AI agent working alongside a human pa
 安装方式：
 
 ```bash
-npx skills add verneagent/lark-wiki
+npx skills add -g verneagent/lark-wiki
 ```
 
 和 OpenClaw 的区别同样主要在分发方式：
