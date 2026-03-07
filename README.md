@@ -1,6 +1,6 @@
 # lark-wiki
 
-`lark-wiki` is a standalone agent skill authored by Verne for reading and editing Lark wiki pages and documents through the Lark Open API.
+`lark-wiki` is a standalone agent skill for reading and editing Lark wiki pages and documents through the Lark Open API.
 
 It gives an agent a practical way to read pages, create pages, inspect document blocks, write structured content, and handle a few browser-only operations that the API does not support well on its own.
 
