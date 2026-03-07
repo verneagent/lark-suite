@@ -25,11 +25,6 @@ npx skills add -g verneagent/lark-wiki
 
 - Supported: Claude Code, OpenCode
 
-## Repository layout
-
-- `SKILL.md` is the skill entrypoint
-- `scripts/` contains the helper scripts
-
 ## Compared with OpenClaw skills
 
 This repository is not an OpenClaw skill published through ClawHub. It is a standalone GitHub skill repository.
