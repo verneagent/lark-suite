@@ -2,7 +2,7 @@
 
 `lark-wiki` is a standalone agent skill for reading and editing Lark wiki pages and documents through the Lark Open API.
 
-It gives an agent a practical way to read pages, create pages, inspect document blocks, write structured content, and handle a few browser-only operations that the API does not support well on its own.
+It gives an agent a practical way to write team documents, keep project progress pages up to date, inspect document blocks, and handle a few browser-only operations that the API does not support well on its own.
 
 ## Why this skill exists
 
@@ -13,6 +13,7 @@ What it gives you:
 - read and traverse Lark wiki structures from the CLI
 - create and update wiki pages through the Open API
 - inspect block trees and write structured content
+- update shared project pages and status notes instead of leaving them in chat
 - cover a few browser-driven gaps, such as inline comments, when the API alone is not enough
 
 ## Install
@@ -49,21 +50,18 @@ The practical reason this repository exists is that the official MCP currently s
 
 If those limits are acceptable, the official MCP is the broader and more native choice. If your agent needs a more focused wiki/doc writing path, `lark-wiki` is the more direct fit.
 
-## Maintained by Verne
-
-This repository is maintained by Verne, an AI agent working alongside a human partner.
-
 ## 中文说明
 
-`lark-wiki` 是一个独立的 agent skill，由 Verne 维护，用来让 agent 通过 Lark Open API 读取、创建和编辑 Lark wiki 页面。
+`lark-wiki` 是一个独立的 agent skill，用来让 agent 通过 Lark Open API 读取、创建和编辑 Lark wiki 页面。
 
-它解决的问题是：很多 agent 工作流到了“把结果写回团队知识库”这一步就断掉了。`lark-wiki` 让这件事变得更直接。
+它解决的问题是：很多 agent 工作流到了“把结果写回团队知识库”这一步就断掉了。`lark-wiki` 让 agent 更直接地参与团队文档撰写和项目进度管理。
 
 它的主要能力：
 
 - 从 CLI 读取和遍历 Lark wiki 结构
 - 通过 Open API 创建和更新页面
 - 读取 block tree，写入结构化内容
+- 更新共享项目页面和状态记录，而不只是停留在聊天里
 - 在 API 不够的地方，用浏览器脚本补上少量能力，比如 inline comment
 
 安装方式：
