@@ -1,12 +1,12 @@
-# lark-wiki
+# lark-suite
 
-`lark-wiki` is a standalone agent skill for reading and editing Lark wiki pages and documents through the Lark Open API.
+`lark-suite` is a standalone agent skill for reading and editing Lark wiki pages, documents, and project-tracking surfaces through the Lark Open API.
 
 It gives an agent a practical way to write team documents, keep project progress pages up to date, inspect document blocks, and handle a few browser-only operations that the API does not support well on its own.
 
 ## Why this skill exists
 
-Many agent workflows break at the point where project knowledge has to move into a team wiki. `lark-wiki` exists to reduce that gap.
+Many agent workflows break at the point where project knowledge has to move into a team wiki. `lark-suite` exists to reduce that gap.
 
 What it gives you:
 
@@ -19,7 +19,7 @@ What it gives you:
 ## Install
 
 ```bash
-npx skills add -g verneagent/lark-wiki
+npx skills add -g verneagent/lark-suite
 ```
 
 ## Scope
@@ -30,7 +30,7 @@ npx skills add -g verneagent/lark-wiki
 
 `larksuite/lark-openapi-mcp` is the official general-purpose Lark MCP. It is the right starting point if you want broad OpenAPI coverage across multiple Lark surfaces.
 
-`lark-wiki` is intentionally narrower. It is optimized for wiki and doc workflows:
+`lark-suite` is intentionally narrower. It is optimized for wiki and doc workflows:
 
 - reading wiki pages and trees
 - creating wiki pages
@@ -41,20 +41,20 @@ npx skills add -g verneagent/lark-wiki
 That makes the choice fairly simple:
 
 - choose `lark-openapi-mcp` if you want an official general Lark MCP
-- choose `lark-wiki` if your main need is wiki/doc authoring flow from an agent
+- choose `lark-suite` if your main need is wiki/doc authoring flow from an agent
 
 The practical reason this repository exists is that the official MCP currently states two boundaries that matter for document-heavy workflows:
 
 - file upload/download is not yet supported
 - direct editing of Feishu/Lark cloud documents is not supported, only importing and reading
 
-If those limits are acceptable, the official MCP is the broader and more native choice. If your agent needs a more focused wiki/doc writing path, `lark-wiki` is the more direct fit.
+If those limits are acceptable, the official MCP is the broader and more native choice. If your agent needs a more focused wiki/doc writing path, `lark-suite` is the more direct fit.
 
 ## 中文说明
 
-`lark-wiki` 是一个独立的 agent skill，用来让 agent 通过 Lark Open API 读取、创建和编辑 Lark wiki 页面。
+`lark-suite` 是一个独立的 agent skill，用来让 agent 通过 Lark Open API 读取、创建和编辑 Lark wiki 页面。
 
-它解决的问题是：很多 agent 工作流到了“把结果写回团队知识库”这一步就断掉了。`lark-wiki` 让 agent 更直接地参与团队文档撰写和项目进度管理。
+它解决的问题是：很多 agent 工作流到了“把结果写回团队知识库”这一步就断掉了。`lark-suite` 让 agent 更直接地参与团队文档撰写和项目进度管理。
 
 它的主要能力：
 
@@ -67,14 +67,14 @@ If those limits are acceptable, the official MCP is the broader and more native 
 安装方式：
 
 ```bash
-npx skills add -g verneagent/lark-wiki
+npx skills add -g verneagent/lark-suite
 ```
 
 ## 与 `lark-openapi-mcp` 的区别
 
 `larksuite/lark-openapi-mcp` 是官方的通用型 Lark MCP，更适合“我想把一大批 Lark OpenAPI 能力统一接给 agent”这种需求。
 
-`lark-wiki` 则是一个刻意做窄的 skill，重点只放在 wiki 和文档工作流上：
+`lark-suite` 则是一个刻意做窄的 skill，重点只放在 wiki 和文档工作流上：
 
 - 读 wiki 页面和目录树
 - 创建 wiki 页面
@@ -85,7 +85,7 @@ npx skills add -g verneagent/lark-wiki
 所以选择逻辑很简单：
 
 - 如果你要官方、通用、覆盖面更广的 Lark MCP，选 `lark-openapi-mcp`
-- 如果你主要要的是 wiki/doc 写作流，选 `lark-wiki`
+- 如果你主要要的是 wiki/doc 写作流，选 `lark-suite`
 
 这个仓库存在的实际原因也很明确：官方 MCP 目前明确写了两条边界，而这两条边界对文档工作流很关键：
 
@@ -93,7 +93,7 @@ npx skills add -g verneagent/lark-wiki
 - 还不支持直接编辑飞书/Lark 云文档，只支持导入和读取
 
 如果这些限制你能接受，官方 MCP 是更原生的选择。  
-如果你要的是更直接的 wiki/doc 写作与编辑路径，`lark-wiki` 会更顺手。
+如果你要的是更直接的 wiki/doc 写作与编辑路径，`lark-suite` 会更顺手。
 
 ## License
 

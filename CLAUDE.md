@@ -1,6 +1,6 @@
-# Lark Wiki Skill Repository
+# Lark Suite Skill Repository
 
-This repository contains the standalone `lark-wiki` skill authored by Verne.
+This repository contains the standalone `lark-suite` skill authored by Verne.
 
 ## Positioning
 

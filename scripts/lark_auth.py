@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Lark Open API authentication: credentials + tenant access token.
 
-Shared by handoff and lark-wiki skills.  Each skill provides its own
+Shared by handoff and lark-suite skills.  Each skill provides its own
 config_file path; the rest (token fetch, caching, file-lock) is identical.
 
 Usage:
     from lark_auth import LarkAuth
-    auth = LarkAuth("~/.lark-wiki/config.json")   # or ~/.handoff/config.json
+    auth = LarkAuth("~/.lark-suite/config.json")   # or ~/.handoff/config.json
     token = auth.get_token()
 """
 

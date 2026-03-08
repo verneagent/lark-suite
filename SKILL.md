@@ -1,6 +1,6 @@
 ---
-name: lark-wiki
-description: Read, create, and edit Lark wiki pages and documents via the Open API.
+name: lark-suite
+description: Read, create, and edit Lark wiki pages, documents, and project-tracking surfaces via the Open API.
 allowed-tools: Bash, Read, Write, Glob, Grep
 ---
 
@@ -8,7 +8,8 @@ Read, create, and edit Lark wiki pages and documents using the Lark Open API.
 
 ## Prerequisites
 
-- Config file: `~/.lark-wiki/config.json` with `app_id` and `app_secret`
+- Config file: `~/.lark-suite/config.json` with `app_id` and `app_secret`
+  - The skill still falls back to `~/.lark-wiki/config.json` if the old path exists and the new one does not
   - If the file doesn't exist, run the `init` command to create it interactively (see below)
 - Required Lark app scopes: `wiki:wiki`, `docx:document` (for write operations)
 - The bot must have edit permission on the target wiki space
@@ -19,7 +20,7 @@ Read, create, and edit Lark wiki pages and documents using the Lark Open API.
 All operations are available via the helper script:
 
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki.py <command> [args]
+python3 .claude/skills/lark-suite/scripts/lark_suite.py <command> [args]
 ```
 
 **Important:** All commands require network access, so use `dangerouslyDisableSandbox: true` for Bash calls.
@@ -28,13 +29,13 @@ python3 .claude/skills/lark-wiki/scripts/lark_wiki.py <command> [args]
 
 ### Initialize credentials (first-time setup)
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki.py init
+python3 .claude/skills/lark-suite/scripts/lark_suite.py init
 ```
-Interactive prompt to create or update `~/.lark-wiki/config.json`. Run this when credentials are missing or need updating. Shows existing values (masked for secrets) and lets you keep or replace them.
+Interactive prompt to create or update `~/.lark-suite/config.json`. Run this when credentials are missing or need updating. Shows existing values (masked for secrets) and lets you keep or replace them.
 
 ### Read a wiki page
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki.py read <node_token>
+python3 .claude/skills/lark-suite/scripts/lark_suite.py read <node_token>
 ```
 Extract `node_token` from wiki URLs: `https://...larksuite.com/wiki/<node_token>`
 
@@ -42,37 +43,37 @@ Returns the plain text content of the page.
 
 ### List child nodes
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki.py list <node_token>
+python3 .claude/skills/lark-suite/scripts/lark_suite.py list <node_token>
 ```
 Returns JSON array of child nodes with `node_token`, `title`, `obj_type`, `has_child`.
 
 ### Tree view (recursive)
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki.py tree <node_token> [--depth N]
+python3 .claude/skills/lark-suite/scripts/lark_suite.py tree <node_token> [--depth N]
 ```
 Prints an indented tree of all descendant nodes. Default depth: 3.
 
 ### Create a wiki page
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki.py create <parent_node_token> "<title>"
+python3 .claude/skills/lark-suite/scripts/lark_suite.py create <parent_node_token> "<title>"
 ```
 Creates a new empty docx page under the given parent. Returns the new node's tokens.
 
 ### Read document blocks (structured)
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki.py blocks <document_id>
+python3 .claude/skills/lark-suite/scripts/lark_suite.py blocks <document_id>
 ```
 Returns the full block tree as JSON. Use `obj_token` (not `node_token`) as the document ID.
 
 ### Write blocks to a document
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki.py write <document_id> '<blocks_json>' [--index N]
+python3 .claude/skills/lark-suite/scripts/lark_suite.py write <document_id> '<blocks_json>' [--index N]
 ```
 Write blocks to a document. Accepts a JSON string or file path. Index -1 = append (default).
 
 ### Add a comment
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki.py comment <document_id> "<text>"
+python3 .claude/skills/lark-suite/scripts/lark_suite.py comment <document_id> "<text>"
 ```
 Adds a **global (whole-document) comment**. The Lark Open API only supports global comments for docx files — inline comments anchored to specific text selections require browser automation (see below).
 
@@ -86,25 +87,25 @@ For operations the Lark API doesn't support (like inline comments), a separate P
 
 ### Login (one-time setup)
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki_browser.py login
+python3 .claude/skills/lark-suite/scripts/lark_suite_browser.py login
 ```
 Opens a headed browser to the Lark login page. Log in manually, then Ctrl+C. Session persists across runs.
 
 ### Add inline comment
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki_browser.py inline-comment <node_token_or_url> --search '<text_to_select>' --comment '<comment_text>'
+python3 .claude/skills/lark-suite/scripts/lark_suite_browser.py inline-comment <node_token_or_url> --search '<text_to_select>' --comment '<comment_text>'
 ```
 Selects the specified text in the document and adds an inline comment anchored to it. Runs in **headed mode** by default (Lark's toolbar doesn't render in headless). Add `--headless` to attempt headless mode (less reliable).
 
 ### Extract highlighted text
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki_browser.py highlights <node_token_or_obj_token>
+python3 .claude/skills/lark-suite/scripts/lark_suite_browser.py highlights <node_token_or_obj_token>
 ```
 Uses the API (no browser needed) to find all text with `background_color` set. Returns JSON with text, color code, and color name.
 
 ### Screenshot a document
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki_browser.py screenshot <node_token_or_url> [-o output.png] [--full-page]
+python3 .claude/skills/lark-suite/scripts/lark_suite_browser.py screenshot <node_token_or_url> [-o output.png] [--full-page]
 ```
 Takes a screenshot of a Lark document (headless). Useful for visual inspection.
 
@@ -112,7 +113,7 @@ Takes a screenshot of a Lark document (headless). Useful for visual inspection.
 
 ### Look up user IDs by email
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki.py contact-lookup user@example.com [user2@example.com ...]
+python3 .claude/skills/lark-suite/scripts/lark_suite.py contact-lookup user@example.com [user2@example.com ...]
 ```
 Returns open_id for each email. Useful for permission management (`perm-add` needs open_id).
 
@@ -120,7 +121,7 @@ Returns open_id for each email. Useful for permission management (`perm-add` nee
 
 ### Add a collaborator
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki.py perm-add <token> <member_open_id> [--file-type docx] [--perm edit]
+python3 .claude/skills/lark-suite/scripts/lark_suite.py perm-add <token> <member_open_id> [--file-type docx] [--perm edit]
 ```
 - `token`: Document/file obj_token
 - `member_open_id`: User's open_id (from `contact-lookup`)
@@ -129,14 +130,14 @@ python3 .claude/skills/lark-wiki/scripts/lark_wiki.py perm-add <token> <member_o
 
 ### List collaborators
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki.py perm-list <token> [--file-type docx]
+python3 .claude/skills/lark-suite/scripts/lark_suite.py perm-list <token> [--file-type docx]
 ```
 
 ## Document Search
 
 ### Search documents globally
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki.py doc-search "<query>" [--count 20] [--doc-types docx,sheet,bitable]
+python3 .claude/skills/lark-suite/scripts/lark_suite.py doc-search "<query>" [--count 20] [--doc-types docx,sheet,bitable]
 ```
 - `--doc-types`: Comma-separated filter — `doc`, `docx`, `sheet`, `bitable`, `slide`, `wiki`
 - Returns: title, token, type, URL, owner
@@ -211,10 +212,10 @@ The `node_token` is the path segment after `/wiki/`. To get the `document_id` (o
 ```bash
 # Manual resolution
 python3 -c "
-import sys; sys.path.insert(0, '.claude/skills/lark-wiki/scripts')
+import sys; sys.path.insert(0, '.claude/skills/lark-suite/scripts')
 from lark_auth import LarkAuth
 import json, urllib.request
-t = LarkAuth('~/.lark-wiki/config.json').get_token()
+t = LarkAuth('~/.lark-suite/config.json').get_token()
 r = urllib.request.urlopen(urllib.request.Request(
     'https://open.larksuite.com/open-apis/wiki/v2/spaces/get_node?token=NODE_TOKEN',
     headers={'Authorization': f'Bearer {t}'}))
@@ -226,17 +227,17 @@ print(json.loads(r.read())['data']['node']['obj_token'])
 
 ### List tables
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki.py base-tables <app_token>
+python3 .claude/skills/lark-suite/scripts/lark_suite.py base-tables <app_token>
 ```
 
 ### List fields in a table
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki.py base-fields <app_token> <table_id>
+python3 .claude/skills/lark-suite/scripts/lark_suite.py base-fields <app_token> <table_id>
 ```
 
 ### List/search records
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki.py base-records <app_token> <table_id> [--filter '<json>']
+python3 .claude/skills/lark-suite/scripts/lark_suite.py base-records <app_token> <table_id> [--filter '<json>']
 ```
 Filter format (Lark filter syntax):
 ```json
@@ -245,17 +246,17 @@ Filter format (Lark filter syntax):
 
 ### Add a record
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki.py base-add <app_token> <table_id> '{"Feature": "New item", "Status": "Backlog"}'
+python3 .claude/skills/lark-suite/scripts/lark_suite.py base-add <app_token> <table_id> '{"Feature": "New item", "Status": "Backlog"}'
 ```
 
 ### Update a record
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki.py base-update <app_token> <table_id> <record_id> '{"Status": "Done"}'
+python3 .claude/skills/lark-suite/scripts/lark_suite.py base-update <app_token> <table_id> <record_id> '{"Status": "Done"}'
 ```
 
 ### Create a table
 ```bash
-python3 .claude/skills/lark-wiki/scripts/lark_wiki.py base-create-table <app_token> '<table_json>'
+python3 .claude/skills/lark-suite/scripts/lark_suite.py base-create-table <app_token> '<table_json>'
 ```
 Table JSON example:
 ```json
