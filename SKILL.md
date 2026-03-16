@@ -571,7 +571,24 @@ for cell_id, content in zip(cells, ["H1", "H2", "H3", "R1C1", "R1C2", "R1C3", ..
 - To make header cells bold, set `"bold": True` in `text_element_style` for the first `column_size` cells
 - Reading existing tables: use `blocks` command to get the document block tree, find type-31 blocks, extract `table.cells[]` for cell IDs
 
-Tables also support `merge_info` (for merged cells) and `column_width` in property.
+### Column widths
+
+Set `column_width` **during table creation** (in `property`). It **cannot be updated** after creation via PATCH — `update_table_property.column_width` returns "field is invalid".
+
+```python
+# Set widths during creation (list of pixel values, one per column)
+api('POST', f'/docx/v1/documents/{doc_id}/blocks/{parent_id}/children', {
+    "children": [{"block_type": 31, "table": {"property": {
+        "row_size": 3, "column_size": 2,
+        "column_width": [200, 500]  # pixels, must match column_size
+    }}}],
+    "index": -1
+})
+```
+
+If you need to change widths on an existing table, you must delete it and recreate it at the same index.
+
+Tables also support `merge_info` (for merged cells).
 
 ## Comments
 
