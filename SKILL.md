@@ -159,7 +159,7 @@ python3 .claude/skills/lark-suite/scripts/lark_suite.py doc-search "<query>" [--
 | 22 | `divider` | `{"block_type": 22, "divider": {}}` |
 | 24 | `grid` | Column layout. `{"block_type": 24, "grid": {"column_size": 2}}` |
 | 26 | `iframe` | Embed. `{"block_type": 26, "iframe": {"component": {"iframe_type": 1, "url": "..."}}}` |
-| 31 | `table` | `{"block_type": 31, "table": {"cells": ["H1","H2","R1C1","R1C2"], "property": {"column_size": 2, "row_size": 2}}}` |
+| 31 | `table` | `{"block_type": 31, "table": {"property": {"column_size": 2, "row_size": 2}}}` — **cells are always empty on creation**; populate each cell separately (see "Tables in Documents") |
 | 34 | `quote_container` | Quote wrapper container |
 
 ### NOT Creatable via API
@@ -541,26 +541,35 @@ First list blocks to find indices, then delete. **Careful**: indices shift after
 
 ## Tables in Documents
 
-Create tables using block type 31:
+Create tables using block type 31. **CRITICAL**: The `cells` parameter in the creation request is **ignored** — the API always creates empty cells. You **must** populate each cell individually as a separate step.
 
 ```python
-# 1. Create the table block — API auto-creates empty cells
+# 1. Create the table block — API auto-creates EMPTY cells
+# Do NOT pass "cells" with content strings — they are ignored
 resp = api('POST', f'/docx/v1/documents/{doc_id}/blocks/{parent_block_id}/children', {
     "children": [{"block_type": 31, "table": {"property": {"row_size": 4, "column_size": 3}}}],
     "index": -1
 })
-# Response contains cell block IDs in table.cells[]
+# Response contains cell block IDs in table.cells[] (flat list, row-major order)
 cells = resp['data']['children'][0]['table']['cells']
+# cells = [row0col0_id, row0col1_id, row0col2_id, row1col0_id, ...]
 
-# 2. Populate each cell by inserting text blocks as children
-api('POST', f'/docx/v1/documents/{doc_id}/blocks/{cell_id}/children', {
-    "children": [{"block_type": 2, "text": {
-        "elements": [{"text_run": {"content": "Cell text", "text_element_style": {"bold": True}}}],
-        "style": {"align": 1, "folded": False}
-    }}],
-    "index": 0
-})
+# 2. Populate EACH cell by inserting a text block as its child
+for cell_id, content in zip(cells, ["H1", "H2", "H3", "R1C1", "R1C2", "R1C3", ...]):
+    api('POST', f'/docx/v1/documents/{doc_id}/blocks/{cell_id}/children', {
+        "children": [{"block_type": 2, "text": {
+            "elements": [{"text_run": {"content": content, "text_element_style": {}}}],
+            "style": {"align": 1, "folded": False}
+        }}],
+        "index": 0
+    })
 ```
+
+**Gotchas:**
+- Each cell requires a separate API call — for large tables, add `time.sleep(0.5)` every ~10 calls to avoid 429 rate limits
+- Cell IDs are in flat row-major order: `[r0c0, r0c1, ..., r1c0, r1c1, ...]`
+- To make header cells bold, set `"bold": True` in `text_element_style` for the first `column_size` cells
+- Reading existing tables: use `blocks` command to get the document block tree, find type-31 blocks, extract `table.cells[]` for cell IDs
 
 Tables also support `merge_info` (for merged cells) and `column_width` in property.
 
