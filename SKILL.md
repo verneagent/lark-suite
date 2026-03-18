@@ -6,6 +6,17 @@ allowed-tools: Bash, Read, Write, Glob, Grep
 
 Read, create, and edit Lark wiki pages and documents using the Lark Open API.
 
+## Reading Wiki Documents
+
+When reading a wiki document, prefer the **block-based** method (`blocks`) over the plain text method (`read`) unless the user explicitly asks for raw text. The block method preserves structure (headings, lists, tables, formatting) and is more useful for understanding and processing document content.
+
+- **`blocks`** (default): Returns structured JSON with block types, hierarchy, and formatting. Use this when you need to understand the document layout, extract specific sections, or work with structured content.
+- **`read`**: Returns flat plain text with no formatting. Use this only when the user explicitly asks for raw/plain text, or when you just need a quick text dump.
+
+**Workflow**: Use `read <node_token>` first to resolve the `obj_token` (printed to stderr), then use `blocks <obj_token>` to get the structured content.
+
+**Note**: The `read` command also works with `obj_token` directly (not just `node_token`). If you already have the `obj_token`, you can skip the `read` step and go straight to `blocks <obj_token>`.
+
 ## Prerequisites
 
 - Config file: `~/.lark-suite/config.json` with `app_id` and `app_secret`
@@ -663,3 +674,18 @@ api('PATCH', f'/slides/v1/presentations/{token}?client_token={uuid}', {"title": 
 | `slides:presentation:update` | Update presentation title |
 
 The bot also needs **edit permission** on the wiki space (added via wiki space settings → Members).
+
+## Troubleshooting
+
+### Wiki Document Write Returns 1770032 forBidden
+
+**Symptom**: App has `docx:document` scope and can read wiki documents, but `POST /docx/v1/documents/{doc_id}/blocks/{doc_id}/children` returns `{"code": 1770032, "msg": "forBidden"}`. Creating wiki nodes returns `131006 "tenant needs edit permission"`.
+
+**Root cause**: Having the `docx:document` scope gives the app the *capability* to edit docs, but the app's `tenant_access_token` also needs **document-level or wiki-space-level edit permission**. Two conditions must be met:
+
+1. The app must be added to the document/wiki-space's "Application" section with editable access
+2. **Only the app's Creator/Owner can effectively grant this** — if a non-owner adds the app, the association is created but the `tenant_access_token` does not actually receive edit permission
+
+**Fix**: Have the app's Creator (visible in Lark developer console → app card) add the app to the wiki space or document's "Application" section with edit access. Non-creators adding the app will not work.
+
+**Alternative**: Use `user_access_token` instead of `tenant_access_token` — this inherits the user's own document permissions, bypassing the app-level authorization requirement.
