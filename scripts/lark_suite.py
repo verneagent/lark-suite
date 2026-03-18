@@ -30,12 +30,26 @@ Permissions:
 
 Document Search:
     python3 lark_suite.py doc-search <query> [--count 20] [--doc-types docx,sheet,bitable]
+
+Tasks (v2):
+    python3 lark_suite.py task-create <summary> [--due YYYY-MM-DD]
+    python3 lark_suite.py task-list [--page-size 50]
+    python3 lark_suite.py task-complete <task_guid>
+
+Calendar:
+    python3 lark_suite.py cal-list
+    python3 lark_suite.py cal-events <calendar_id> [--start ISO] [--end ISO]
+    python3 lark_suite.py cal-create <calendar_id> <summary> <start_iso> <end_iso>
+
+IM (Messaging):
+    python3 lark_suite.py im-send <receive_id> <text> [--receive-id-type chat_id]
 """
 
 import argparse
 import json
 import os
 import sys
+import time
 import urllib.error
 import urllib.request
 
@@ -593,6 +607,167 @@ def cmd_doc_search(args):
 
 
 # ---------------------------------------------------------------------------
+# Task Commands (v2)
+# ---------------------------------------------------------------------------
+
+
+def cmd_task_create(args):
+    """Create a task."""
+    token = get_token()
+    body = {"summary": args.summary}
+    if args.due:
+        body["due"] = {"date": args.due}
+    result = api_post("/task/v2/tasks", token, body)
+    task = result.get("data", {}).get("task", {})
+    print(json.dumps({
+        "guid": task.get("guid"),
+        "summary": task.get("summary"),
+        "due": task.get("due"),
+    }, indent=2, ensure_ascii=False))
+
+
+def cmd_task_list(args):
+    """List tasks."""
+    token = get_token()
+    page_size = args.page_size
+    all_tasks = []
+    page_token = ""
+    while True:
+        url = f"/task/v2/tasks?page_size={page_size}"
+        if page_token:
+            url += f"&page_token={page_token}"
+        result = api_get(url, token)
+        items = result.get("data", {}).get("items", [])
+        all_tasks.extend(items)
+        if not result.get("data", {}).get("page_token"):
+            break
+        page_token = result["data"]["page_token"]
+    output = []
+    for t in all_tasks:
+        output.append({
+            "guid": t.get("guid"),
+            "summary": t.get("summary"),
+            "completed_at": t.get("completed_at"),
+            "due": t.get("due"),
+        })
+    print(json.dumps(output, indent=2, ensure_ascii=False))
+
+
+def cmd_task_complete(args):
+    """Complete a task."""
+    token = get_token()
+    body = json.dumps({"task": {"completed_at": str(int(time.time()))}}).encode()
+    url = f"{BASE}/task/v2/tasks/{args.task_guid}"
+    req = urllib.request.Request(
+        url,
+        data=body,
+        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+        method="PATCH",
+    )
+    resp = urllib.request.urlopen(req)
+    result = json.loads(resp.read())
+    task = result.get("data", {}).get("task", {})
+    print(json.dumps({
+        "guid": task.get("guid"),
+        "summary": task.get("summary"),
+        "completed_at": task.get("completed_at"),
+    }, indent=2, ensure_ascii=False))
+
+
+# ---------------------------------------------------------------------------
+# Calendar Commands
+# ---------------------------------------------------------------------------
+
+
+def cmd_cal_list(args):
+    """List calendars."""
+    token = get_token()
+    all_cals = []
+    page_token = ""
+    while True:
+        url = "/calendar/v4/calendars?page_size=50"
+        if page_token:
+            url += f"&page_token={page_token}"
+        result = api_get(url, token)
+        items = result.get("data", {}).get("calendar_list", [])
+        all_cals.extend(items)
+        if not result.get("data", {}).get("page_token"):
+            break
+        page_token = result["data"]["page_token"]
+    output = []
+    for c in all_cals:
+        output.append({
+            "calendar_id": c.get("calendar_id"),
+            "summary": c.get("summary"),
+            "type": c.get("type"),
+        })
+    print(json.dumps(output, indent=2, ensure_ascii=False))
+
+
+def cmd_cal_events(args):
+    """List calendar events."""
+    token = get_token()
+    url = f"/calendar/v4/calendars/{args.calendar_id}/events?page_size=50"
+    if args.start:
+        url += f"&start_time={args.start}"
+    if args.end:
+        url += f"&end_time={args.end}"
+    result = api_get(url, token)
+    items = result.get("data", {}).get("items", [])
+    output = []
+    for e in items:
+        output.append({
+            "event_id": e.get("event_id"),
+            "summary": e.get("summary"),
+            "start_time": e.get("start_time"),
+            "end_time": e.get("end_time"),
+            "status": e.get("status"),
+        })
+    print(json.dumps(output, indent=2, ensure_ascii=False))
+
+
+def cmd_cal_create(args):
+    """Create a calendar event."""
+    token = get_token()
+    body = {
+        "summary": args.summary,
+        "start_time": {"timestamp": args.start},
+        "end_time": {"timestamp": args.end},
+    }
+    result = api_post(
+        f"/calendar/v4/calendars/{args.calendar_id}/events",
+        token,
+        body,
+    )
+    event = result.get("data", {}).get("event", {})
+    print(json.dumps({
+        "event_id": event.get("event_id"),
+        "summary": event.get("summary"),
+    }, indent=2, ensure_ascii=False))
+
+
+# ---------------------------------------------------------------------------
+# IM (Messaging) Commands
+# ---------------------------------------------------------------------------
+
+
+def cmd_im_send(args):
+    """Send a text message."""
+    token = get_token()
+    body = {
+        "receive_id": args.receive_id,
+        "msg_type": "text",
+        "content": json.dumps({"text": args.text}),
+    }
+    url = f"/im/v1/messages?receive_id_type={args.receive_id_type}"
+    result = api_post(url, token, body)
+    msg = result.get("data", {})
+    print(json.dumps({
+        "message_id": msg.get("message_id"),
+    }, indent=2, ensure_ascii=False))
+
+
+# ---------------------------------------------------------------------------
 # Init Command
 # ---------------------------------------------------------------------------
 
@@ -747,6 +922,41 @@ def main():
     p.add_argument("--count", type=int, default=20, help="Max results (default: 20)")
     p.add_argument("--doc-types", help="Comma-separated types: doc,docx,sheet,bitable,slide,wiki")
 
+    # task-create
+    p = sub.add_parser("task-create", help="Create a task")
+    p.add_argument("summary", help="Task summary")
+    p.add_argument("--due", help="Due date (YYYY-MM-DD)")
+
+    # task-list
+    p = sub.add_parser("task-list", help="List tasks")
+    p.add_argument("--page-size", type=int, default=50, help="Page size (default: 50)")
+
+    # task-complete
+    p = sub.add_parser("task-complete", help="Complete a task")
+    p.add_argument("task_guid", help="Task GUID")
+
+    # cal-list
+    sub.add_parser("cal-list", help="List calendars")
+
+    # cal-events
+    p = sub.add_parser("cal-events", help="List calendar events")
+    p.add_argument("calendar_id", help="Calendar ID")
+    p.add_argument("--start", help="Start time (ISO timestamp)")
+    p.add_argument("--end", help="End time (ISO timestamp)")
+
+    # cal-create
+    p = sub.add_parser("cal-create", help="Create a calendar event")
+    p.add_argument("calendar_id", help="Calendar ID")
+    p.add_argument("summary", help="Event summary")
+    p.add_argument("start", help="Start time (ISO timestamp)")
+    p.add_argument("end", help="End time (ISO timestamp)")
+
+    # im-send
+    p = sub.add_parser("im-send", help="Send a text message")
+    p.add_argument("receive_id", help="Receive ID (chat_id, user_id, etc.)")
+    p.add_argument("text", help="Message text")
+    p.add_argument("--receive-id-type", default="chat_id", help="ID type (default: chat_id)")
+
     args = parser.parse_args()
 
     try:
@@ -769,6 +979,13 @@ def main():
             "perm-add": cmd_perm_add,
             "perm-list": cmd_perm_list,
             "doc-search": cmd_doc_search,
+            "task-create": cmd_task_create,
+            "task-list": cmd_task_list,
+            "task-complete": cmd_task_complete,
+            "cal-list": cmd_cal_list,
+            "cal-events": cmd_cal_events,
+            "cal-create": cmd_cal_create,
+            "im-send": cmd_im_send,
         }[args.command](args)
     except urllib.error.HTTPError as e:
         err = e.read().decode()

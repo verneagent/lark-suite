@@ -34,10 +34,17 @@ class LarkAuth:
     # ------------------------------------------------------------------
 
     def load_credentials(self):
-        """Load app_id/app_secret from config file.
+        """Load app_id/app_secret from env vars or config file.
 
+        Env vars LARK_APP_ID / LARK_APP_SECRET take precedence (for
+        subprocess calling from agent-runtime).
         Returns dict with at least app_id and app_secret, or None.
         """
+        env_id = os.environ.get("LARK_APP_ID")
+        env_secret = os.environ.get("LARK_APP_SECRET")
+        if env_id and env_secret:
+            return {"app_id": env_id, "app_secret": env_secret}
+
         try:
             with open(self._config_file) as f:
                 data = json.load(f)
